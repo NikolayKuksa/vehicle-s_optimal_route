@@ -27,6 +27,7 @@ public class InputRouteUI extends javax.swing.JFrame {
     public InputRouteUI() {
         initComponents();
         model =(DefaultTableModel) jTable1.getModel();
+        //model.
         
         nonCar();
         
@@ -49,6 +50,7 @@ public class InputRouteUI extends javax.swing.JFrame {
         });
         jMenu3.add(m4);
         m4.setActionCommand("Car2");
+        jList2.setSelectedIndex(0);
     }
 
     /**
@@ -103,11 +105,12 @@ public class InputRouteUI extends javax.swing.JFrame {
         jComboBox2 = new javax.swing.JComboBox();
         jComboBox4 = new javax.swing.JComboBox();
         jTextField1 = new javax.swing.JTextField();
-        scrCurRoute = new javax.swing.JScrollPane();
-        txaCurRoute = new javax.swing.JTextArea();
         lblCurRoute = new javax.swing.JLabel();
         jButton4 = new javax.swing.JButton();
         jButton6 = new javax.swing.JButton();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        jList2 = new javax.swing.JList();
+        jButton7 = new javax.swing.JButton();
         btnBuildOptimalRoute = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
@@ -285,7 +288,7 @@ public class InputRouteUI extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Пошук оптимального маршруту - Вибір автомобіля, маршруту");
         setLocationByPlatform(true);
-        setMinimumSize(new java.awt.Dimension(793, 530));
+        setMinimumSize(new java.awt.Dimension(793, 567));
 
         pnlRoute.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "Дані про маршрут"));
 
@@ -438,16 +441,35 @@ public class InputRouteUI extends javax.swing.JFrame {
                 .addContainerGap(13, Short.MAX_VALUE))
         );
 
-        txaCurRoute.setColumns(20);
-        txaCurRoute.setRows(5);
-        txaCurRoute.setEnabled(false);
-        scrCurRoute.setViewportView(txaCurRoute);
-
         lblCurRoute.setText("Поточний введений маршрут:");
 
         jButton4.setText("Попередня точка");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
 
         jButton6.setText("Наступна точка");
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton6ActionPerformed(evt);
+            }
+        });
+
+        jList2.setModel(new javax.swing.AbstractListModel() {
+            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            public int getSize() { return strings.length; }
+            public Object getElementAt(int i) { return strings[i]; }
+        });
+        jScrollPane4.setViewportView(jList2);
+
+        jButton7.setText("Видалити");
+        jButton7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton7ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout pnlRouteLayout = new javax.swing.GroupLayout(pnlRoute);
         pnlRoute.setLayout(pnlRouteLayout);
@@ -456,16 +478,17 @@ public class InputRouteUI extends javax.swing.JFrame {
             .addGroup(pnlRouteLayout.createSequentialGroup()
                 .addGap(10, 10, 10)
                 .addComponent(lblCurRoute)
-                .addContainerGap(463, Short.MAX_VALUE))
+                .addContainerGap(473, Short.MAX_VALUE))
             .addGroup(pnlRouteLayout.createSequentialGroup()
                 .addGroup(pnlRouteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pnlRouteLayout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(scrCurRoute)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(pnlRouteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jButton6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addComponent(jButton6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jButton7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(pnlRouteLayout.createSequentialGroup()
                         .addGap(10, 10, 10)
                         .addComponent(pnlMyRoutes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -487,12 +510,14 @@ public class InputRouteUI extends javax.swing.JFrame {
                     .addGroup(pnlRouteLayout.createSequentialGroup()
                         .addComponent(jButton4)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton6))
-                    .addComponent(scrCurRoute, javax.swing.GroupLayout.DEFAULT_SIZE, 106, Short.MAX_VALUE))
+                        .addComponent(jButton6)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton7))
+                    .addGroup(pnlRouteLayout.createSequentialGroup()
+                        .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                        .addGap(2, 2, 2)))
                 .addContainerGap())
         );
-
-        pnlNewRoute.getAccessibleContext().setAccessibleName("Поточний маршрут");
 
         btnBuildOptimalRoute.setText("Побудова оптмального маршруту");
         btnBuildOptimalRoute.addActionListener(new java.awt.event.ActionListener() {
@@ -541,14 +566,15 @@ public class InputRouteUI extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btnBuildOptimalRoute, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(pnlRoute, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addContainerGap(444, Short.MAX_VALUE)
+                        .addComponent(btnBuildOptimalRoute))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(10, 10, 10)
                         .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(10, 10, 10))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addComponent(pnlRoute, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -557,9 +583,9 @@ public class InputRouteUI extends javax.swing.JFrame {
                 .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlRoute, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(2, 2, 2)
+                .addGap(6, 6, 6)
                 .addComponent(btnBuildOptimalRoute)
-                .addContainerGap())
+                .addGap(6, 6, 6))
         );
 
         pack();
@@ -613,6 +639,22 @@ public class InputRouteUI extends javax.swing.JFrame {
         jDialog2.setVisible(false);
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        int index=jList2.getSelectedIndex();
+        if(index>0)
+            jList2.setSelectedIndex(index-1);
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+        int index=jList2.getSelectedIndex();
+        if(index<jList2.getSize().getHeight()-1) 
+            jList2.setSelectedIndex(index+1);
+    }//GEN-LAST:event_jButton6ActionPerformed
+
+    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
+       
+    }//GEN-LAST:event_jButton7ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -660,6 +702,7 @@ public class InputRouteUI extends javax.swing.JFrame {
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
+    private javax.swing.JButton jButton7;
     private javax.swing.JComboBox jComboBox1;
     private javax.swing.JComboBox jComboBox2;
     private javax.swing.JComboBox jComboBox3;
@@ -671,6 +714,7 @@ public class InputRouteUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JList jList1;
+    private javax.swing.JList jList2;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
@@ -683,6 +727,7 @@ public class InputRouteUI extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTable jTable1;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextPane jTextPane1;
@@ -696,8 +741,6 @@ public class InputRouteUI extends javax.swing.JFrame {
     private javax.swing.JPanel pnlMyRoutes;
     private javax.swing.JPanel pnlNewRoute;
     private javax.swing.JPanel pnlRoute;
-    private javax.swing.JScrollPane scrCurRoute;
-    private javax.swing.JTextArea txaCurRoute;
     // End of variables declaration//GEN-END:variables
 
     private void nonCar() {

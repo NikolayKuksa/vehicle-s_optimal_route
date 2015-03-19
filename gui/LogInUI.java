@@ -13,36 +13,21 @@ import java.util.logging.Logger;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.MaskFormatter;
+import src.DocFilter;
 /**
  *
  * @author Николай
  */
 public class LogInUI extends javax.swing.JFrame {
     private LogInController loginControl;
-    private Color errorMess=new Color(255,0,51);
-    private int lenghtTxt=16;
+    
+    private int lenghtTxt=10;
+    
     public LogInUI() throws ParseException {
         initComponents();
-        loginControl=new LogInController();
-        btnLogIn.addActionListener(loginControl);
-        
-        btnLogIn.setEnabled(false);
-        jButton1.setEnabled(false);
-        AbstractDocument doc = (AbstractDocument) txtPassword.getDocument();
-        doc.setDocumentFilter(new LengthFilter(doc.getLength(), lenghtTxt));
-        //AbstractDocument doc2 = (AbstractDocument) txtPassword.getDocument();
-        //doc2.setDocumentFilter(new LengthFilter(doc2.getLength(), lenghtTxt));
-        
-        MaskFormatter loginMask=new MaskFormatter("?AAAAAAAAAAAAAAA");
-        DefaultFormatterFactory formatterFactory 
-                = new DefaultFormatterFactory(loginMask);
-        ftxLogin.setFormatterFactory(formatterFactory);
-        ftxLogin1.setFormatterFactory(formatterFactory);
-        
-        MaskFormatter driverMask=new MaskFormatter("UUU-######");
-        DefaultFormatterFactory formatterFactory2 
-                = new DefaultFormatterFactory(driverMask);
-        jFormattedTextField1.setFormatterFactory(formatterFactory2);
+        setFieldFilters();
+        loginControl=new LogInController(this);
+        addListenerForComponents();
         
     }
 
@@ -55,164 +40,134 @@ public class LogInUI extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jDialog1 = new javax.swing.JDialog();
-        jPanel1 = new javax.swing.JPanel();
-        jPasswordField2 = new javax.swing.JPasswordField();
-        lblLogin1 = new javax.swing.JLabel();
-        ftxLogin1 = new javax.swing.JFormattedTextField();
-        jPasswordField1 = new javax.swing.JPasswordField();
-        lblPass1Status = new javax.swing.JLabel();
+        dlgSignIn = new javax.swing.JDialog();
+        pnlSignIn = new javax.swing.JPanel();
+        txtConfirmPasswordSignIn = new javax.swing.JPasswordField();
+        lblLoginSignIn = new javax.swing.JLabel();
+        txtPasswordSignIn = new javax.swing.JPasswordField();
+        lblPassStatusSignIn = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        lblLogin1Status = new javax.swing.JLabel();
-        jFormattedTextField1 = new javax.swing.JFormattedTextField();
+        lblLoginStatusSignIn = new javax.swing.JLabel();
+        ftxDriverLicense = new javax.swing.JFormattedTextField();
         jLabel5 = new javax.swing.JLabel();
-        lblPass2Status = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
-        jLabel2 = new javax.swing.JLabel();
-        pnlAutorization = new javax.swing.JPanel();
-        lblLogin = new javax.swing.JLabel();
-        lblPassword = new javax.swing.JLabel();
-        btnLogIn = new javax.swing.JButton();
+        lblConfirmPassStatusSignIn = new javax.swing.JLabel();
         btnSignIn = new javax.swing.JButton();
-        txtPassword = new javax.swing.JPasswordField();
-        lblLoginStatus = new javax.swing.JLabel();
-        ftxLogin = new javax.swing.JFormattedTextField();
+        jLabel2 = new javax.swing.JLabel();
+        txtLoginSignIn = new javax.swing.JTextField();
+        pnlAutorization = new javax.swing.JPanel();
+        lblLoginAutorization = new javax.swing.JLabel();
+        lblPasswordAutorization = new javax.swing.JLabel();
+        btnLogIn = new javax.swing.JButton();
+        btnSignInAutorization = new javax.swing.JButton();
+        txtPasswordAutorization = new javax.swing.JPasswordField();
+        lblLoginStatusAutorization = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         lblPassStatus = new javax.swing.JLabel();
+        txtLoginAutorization = new javax.swing.JTextField();
 
-        jDialog1.setTitle("Пошук оптимального маршруту - Реєстрація в системі");
-        jDialog1.setLocationByPlatform(true);
-        jDialog1.setMinimumSize(new java.awt.Dimension(344, 326));
-        jDialog1.setModal(true);
-        jDialog1.setResizable(false);
-        jDialog1.setType(java.awt.Window.Type.UTILITY);
-
-        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-
-        jPasswordField2.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                jPasswordField2FocusLost(evt);
-            }
-        });
-        jPasswordField2.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                jPasswordField2KeyReleased(evt);
+        dlgSignIn.setTitle("Пошук оптимального маршруту - Реєстрація в системі");
+        dlgSignIn.setLocationByPlatform(true);
+        dlgSignIn.setMinimumSize(new java.awt.Dimension(344, 326));
+        dlgSignIn.setModal(true);
+        dlgSignIn.setResizable(false);
+        dlgSignIn.setType(java.awt.Window.Type.UTILITY);
+        dlgSignIn.addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                dlgSignInWindowClosing(evt);
             }
         });
 
-        lblLogin1.setText("Введіть логін:");
+        pnlSignIn.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        ftxLogin1.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
-        ftxLogin1.setFocusLostBehavior(javax.swing.JFormattedTextField.PERSIST);
-        ftxLogin1.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                ftxLogin1FocusGained(evt);
-            }
-        });
-        ftxLogin1.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                ftxLogin1KeyPressed(evt);
-            }
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                ftxLogin1KeyReleased(evt);
-            }
-        });
-
-        jPasswordField1.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                jPasswordField1KeyReleased(evt);
-            }
-        });
+        lblLoginSignIn.setText("Введіть логін:");
 
         jLabel4.setText("Введіть пароль");
 
-        jFormattedTextField1.setFocusLostBehavior(javax.swing.JFormattedTextField.PERSIST);
-        jFormattedTextField1.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                jFormattedTextField1FocusLost(evt);
-            }
-        });
+        ftxDriverLicense.setFocusLostBehavior(javax.swing.JFormattedTextField.PERSIST);
 
         jLabel5.setText("Серія та номер водійського посвідчення:");
 
-        jButton1.setText("Реєстрація");
+        btnSignIn.setText("Реєстрація");
 
         jLabel2.setText("Підтвердіть пароль");
         jLabel2.setToolTipText("");
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
+        javax.swing.GroupLayout pnlSignInLayout = new javax.swing.GroupLayout(pnlSignIn);
+        pnlSignIn.setLayout(pnlSignInLayout);
+        pnlSignInLayout.setHorizontalGroup(
+            pnlSignInLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlSignInLayout.createSequentialGroup()
+                .addGroup(pnlSignInLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlSignInLayout.createSequentialGroup()
                         .addContainerGap()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblLogin1)
+                        .addGroup(pnlSignInLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblLoginSignIn)
                             .addComponent(jLabel4)
                             .addComponent(jLabel5)
                             .addComponent(jLabel2)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(jFormattedTextField1, javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jPasswordField2)
-                                    .addComponent(jPasswordField1)
-                                    .addComponent(ftxLogin1, javax.swing.GroupLayout.DEFAULT_SIZE, 130, Short.MAX_VALUE))
+                            .addGroup(pnlSignInLayout.createSequentialGroup()
+                                .addGroup(pnlSignInLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addComponent(ftxDriverLicense, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 130, Short.MAX_VALUE)
+                                    .addComponent(txtConfirmPasswordSignIn)
+                                    .addComponent(txtPasswordSignIn)
+                                    .addComponent(txtLoginSignIn))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(lblPass2Status)
-                                    .addComponent(lblLogin1Status)
-                                    .addComponent(lblPass1Status)))))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGroup(pnlSignInLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(lblConfirmPassStatusSignIn)
+                                    .addComponent(lblLoginStatusSignIn)
+                                    .addComponent(lblPassStatusSignIn)))))
+                    .addGroup(pnlSignInLayout.createSequentialGroup()
                         .addGap(131, 131, 131)
-                        .addComponent(jButton1)))
+                        .addComponent(btnSignIn)))
                 .addContainerGap(102, Short.MAX_VALUE))
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+        pnlSignInLayout.setVerticalGroup(
+            pnlSignInLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlSignInLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblLogin1)
+                .addComponent(lblLoginSignIn)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(ftxLogin1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblLogin1Status))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(pnlSignInLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlSignInLayout.createSequentialGroup()
+                        .addComponent(lblLoginStatusSignIn)
+                        .addGap(20, 20, 20))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlSignInLayout.createSequentialGroup()
+                        .addComponent(txtLoginSignIn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jPasswordField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblPass1Status))
+                .addGroup(pnlSignInLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtPasswordSignIn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblPassStatusSignIn))
                 .addGap(11, 11, 11)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jPasswordField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblPass2Status))
+                .addGroup(pnlSignInLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtConfirmPasswordSignIn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblConfirmPassStatusSignIn))
                 .addGap(18, 18, 18)
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jFormattedTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(ftxDriverLicense, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton1)
-                .addContainerGap(60, Short.MAX_VALUE))
+                .addComponent(btnSignIn)
+                .addContainerGap(65, Short.MAX_VALUE))
         );
 
-        javax.swing.GroupLayout jDialog1Layout = new javax.swing.GroupLayout(jDialog1.getContentPane());
-        jDialog1.getContentPane().setLayout(jDialog1Layout);
-        jDialog1Layout.setHorizontalGroup(
-            jDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jDialog1Layout.createSequentialGroup()
+        javax.swing.GroupLayout dlgSignInLayout = new javax.swing.GroupLayout(dlgSignIn.getContentPane());
+        dlgSignIn.getContentPane().setLayout(dlgSignInLayout);
+        dlgSignInLayout.setHorizontalGroup(
+            dlgSignInLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(dlgSignInLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(pnlSignIn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
-        jDialog1Layout.setVerticalGroup(
-            jDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jDialog1Layout.createSequentialGroup()
+        dlgSignInLayout.setVerticalGroup(
+            dlgSignInLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(dlgSignInLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(pnlSignIn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -224,53 +179,27 @@ public class LogInUI extends javax.swing.JFrame {
         setType(java.awt.Window.Type.UTILITY);
 
         pnlAutorization.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        pnlAutorization.setForeground(new java.awt.Color(255, 51, 51));
         pnlAutorization.setMaximumSize(new java.awt.Dimension(319, 140));
         pnlAutorization.setMinimumSize(new java.awt.Dimension(319, 140));
 
-        lblLogin.setLabelFor(ftxLogin);
-        lblLogin.setText("Логін");
-        lblLogin.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        lblLoginAutorization.setText("Логін");
+        lblLoginAutorization.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
-        lblPassword.setText("Пароль");
+        lblPasswordAutorization.setText("Пароль");
 
         btnLogIn.setText("Авторизація");
-        btnLogIn.setActionCommand("login");
-        btnLogIn.addActionListener(new java.awt.event.ActionListener() {
+        btnLogIn.setActionCommand("");
+
+        btnSignInAutorization.setFont(new java.awt.Font("Tahoma", 2, 11)); // NOI18N
+        btnSignInAutorization.setText("Реєстрація");
+        btnSignInAutorization.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLogInActionPerformed(evt);
+                btnSignInAutorizationActionPerformed(evt);
             }
         });
 
-        btnSignIn.setFont(new java.awt.Font("Tahoma", 2, 11)); // NOI18N
-        btnSignIn.setText("Реєстрація");
-        btnSignIn.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSignInActionPerformed(evt);
-            }
-        });
-
-        txtPassword.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                txtPasswordKeyReleased(evt);
-            }
-        });
-
-        lblLoginStatus.setLabelFor(ftxLogin);
-
-        ftxLogin.setFocusLostBehavior(javax.swing.JFormattedTextField.PERSIST);
-        ftxLogin.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                ftxLoginFocusGained(evt);
-            }
-        });
-        ftxLogin.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                ftxLoginKeyPressed(evt);
-            }
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                ftxLoginKeyReleased(evt);
-            }
-        });
+        lblLoginStatusAutorization.setLabelFor(txtLoginAutorization);
 
         jLabel1.setText("Не заререєстровані у системі?");
 
@@ -286,26 +215,25 @@ public class LogInUI extends javax.swing.JFrame {
                         .addGroup(pnlAutorizationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(pnlAutorizationLayout.createSequentialGroup()
                                 .addContainerGap()
-                                .addComponent(lblPassword))
+                                .addComponent(lblPasswordAutorization))
                             .addGroup(pnlAutorizationLayout.createSequentialGroup()
                                 .addGap(10, 10, 10)
-                                .addComponent(lblLogin)))
+                                .addComponent(lblLoginAutorization)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(pnlAutorizationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(pnlAutorizationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(btnLogIn)
-                            .addGroup(pnlAutorizationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(ftxLogin, javax.swing.GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE)
-                                .addComponent(txtPassword)))
+                            .addComponent(txtPasswordAutorization, javax.swing.GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE)
+                            .addComponent(txtLoginAutorization))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(pnlAutorizationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(lblPassStatus)
-                            .addComponent(lblLoginStatus))
+                            .addComponent(lblLoginStatusAutorization))
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlAutorizationLayout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 56, Short.MAX_VALUE)
-                        .addComponent(btnSignIn)))
+                        .addComponent(btnSignInAutorization)))
                 .addContainerGap())
         );
         pnlAutorizationLayout.setVerticalGroup(
@@ -313,20 +241,20 @@ public class LogInUI extends javax.swing.JFrame {
             .addGroup(pnlAutorizationLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(pnlAutorizationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(ftxLogin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblLoginStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lblLoginAutorization, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblLoginStatusAutorization, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtLoginAutorization, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(pnlAutorizationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblPassword)
+                    .addComponent(lblPasswordAutorization)
                     .addGroup(pnlAutorizationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(txtPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtPasswordAutorization, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(lblPassStatus)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnLogIn)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(pnlAutorizationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnSignIn)
+                    .addComponent(btnSignInAutorization)
                     .addComponent(jLabel1))
                 .addContainerGap())
         );
@@ -351,106 +279,18 @@ public class LogInUI extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnLogInActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogInActionPerformed
-        this.hide();
-    }//GEN-LAST:event_btnLogInActionPerformed
-    private int lengthMaskString(String s){
-        return s.indexOf(" ")!=-1 ? s.indexOf(" "):s.length();
-    }
-    private void ftxLoginKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_ftxLoginKeyReleased
-        int lengthLogin= lengthMaskString(ftxLogin.getText()); 
-        if(ftxLogin.getCaretPosition()>lengthLogin)
-            ftxLogin.setCaretPosition(lengthLogin);
-        if(lengthLogin<3){
-            lblLoginStatus.setForeground(errorMess);
-            lblLoginStatus.setText("Не менше 3 знаків!");
-        }
-        else 
-            lblLoginStatus.setText("");
-        btnLogInIsVisible();
-    }//GEN-LAST:event_ftxLoginKeyReleased
+    private void btnSignInAutorizationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSignInAutorizationActionPerformed
+        this.setVisible(false);
+        this.dlgSignIn.setVisible(true);
+    }//GEN-LAST:event_btnSignInAutorizationActionPerformed
 
-    private void ftxLoginFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_ftxLoginFocusGained
-        lblLoginStatus.setText("");
-    }//GEN-LAST:event_ftxLoginFocusGained
-
-    private void btnSignInActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSignInActionPerformed
-        this.jDialog1.setVisible(true);
-    }//GEN-LAST:event_btnSignInActionPerformed
-
-    private void ftxLoginKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_ftxLoginKeyPressed
-        int lengthLogin= lengthMaskString(ftxLogin.getText()); 
-        if(ftxLogin.getCaretPosition()>lengthLogin)
-            ftxLogin.setCaretPosition(lengthLogin);
-    }//GEN-LAST:event_ftxLoginKeyPressed
-
-    private void ftxLogin1FocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_ftxLogin1FocusGained
-        lblLoginStatus.setText("");
-    }//GEN-LAST:event_ftxLogin1FocusGained
-
-    private void ftxLogin1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_ftxLogin1KeyPressed
-        int lengthLogin= lengthMaskString(ftxLogin.getText());
-        if(ftxLogin.getCaretPosition()>lengthLogin)
-        ftxLogin.setCaretPosition(lengthLogin);
-    }//GEN-LAST:event_ftxLogin1KeyPressed
-
-    private void ftxLogin1KeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_ftxLogin1KeyReleased
-        int lengthLogin= lengthMaskString(ftxLogin1.getText());
-        //jLabel4.setText(
-            //new Integer(ftxLogin.getCaretPosition()).toString());
-        if(ftxLogin1.getCaretPosition()>lengthLogin)
-        ftxLogin1.setCaretPosition(lengthLogin);
-        if(lengthLogin<3){
-            lblLogin1Status.setForeground(errorMess);
-            lblLogin1Status.setText("Не менше 3-х символів!");
-        }
-        else
-            lblLogin1Status.setText("");
-        
-    }//GEN-LAST:event_ftxLogin1KeyReleased
-
-    private void txtPasswordKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPasswordKeyReleased
-        if(txtPassword.getText().length()<3){
-            lblPassStatus.setForeground(errorMess);
-            lblPassStatus.setText("Не менше 3 знаків!");
-        }
-        else
-            lblPassStatus.setText("");
-        btnLogInIsVisible();
-    }//GEN-LAST:event_txtPasswordKeyReleased
-
-    private void jPasswordField1KeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jPasswordField1KeyReleased
-        if(jPasswordField1.getText().length()<3){
-            lblPass1Status.setForeground(errorMess);
-            lblPass1Status.setText("Не менше 3-х символів!");
-        }
-        else{
-            lblPass1Status.setText("");
-            equalPass();
-        }
-        btnSignInIsVisible();
-    }//GEN-LAST:event_jPasswordField1KeyReleased
-
-    private void jPasswordField2KeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jPasswordField2KeyReleased
-        if(jPasswordField2.getText().length()<3){
-            lblPass2Status.setForeground(errorMess);
-            lblPass2Status.setText("Не менше 3-х символів!");
-        }
-        else{
-            lblPass2Status.setText("");
-            equalPass();
-        }
-        btnSignInIsVisible();
-    }//GEN-LAST:event_jPasswordField2KeyReleased
-
-    private void jPasswordField2FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jPasswordField2FocusLost
-        equalPass();
-        btnSignInIsVisible();
-    }//GEN-LAST:event_jPasswordField2FocusLost
-
-    private void jFormattedTextField1FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jFormattedTextField1FocusLost
-        btnSignInIsVisible();
-    }//GEN-LAST:event_jFormattedTextField1FocusLost
+    private void dlgSignInWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_dlgSignInWindowClosing
+        this.setVisible(true);
+        this.txtLoginAutorization.setText("");
+        this.txtPasswordAutorization.setText("");
+        this.lblLoginStatusAutorization.setText("");
+        this.lblPassStatus.setText(null);
+    }//GEN-LAST:event_dlgSignInWindowClosing
 
     /**
      * @param args the command line arguments
@@ -468,25 +308,17 @@ public class LogInUI extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(LogInUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(LogInUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(LogInUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(LogInUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    new LogInUI().setVisible(true);
-                } catch (ParseException ex) {
-                    Logger.getLogger(LogInUI.class.getName()).log(Level.SEVERE, null, ex);
-                }
+        java.awt.EventQueue.invokeLater(() -> {
+            try {
+                new LogInUI().setVisible(true);
+            } catch (ParseException ex) {
+                Logger.getLogger(LogInUI.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
     }
@@ -494,36 +326,42 @@ public class LogInUI extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnLogIn;
     private javax.swing.JButton btnSignIn;
-    private javax.swing.JFormattedTextField ftxLogin;
-    private javax.swing.JFormattedTextField ftxLogin1;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JDialog jDialog1;
-    private javax.swing.JFormattedTextField jFormattedTextField1;
+    private javax.swing.JButton btnSignInAutorization;
+    private javax.swing.JDialog dlgSignIn;
+    private javax.swing.JFormattedTextField ftxDriverLicense;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPasswordField jPasswordField1;
-    private javax.swing.JPasswordField jPasswordField2;
-    private javax.swing.JLabel lblLogin;
-    private javax.swing.JLabel lblLogin1;
-    private javax.swing.JLabel lblLogin1Status;
-    private javax.swing.JLabel lblLoginStatus;
-    private javax.swing.JLabel lblPass1Status;
-    private javax.swing.JLabel lblPass2Status;
+    private javax.swing.JLabel lblConfirmPassStatusSignIn;
+    private javax.swing.JLabel lblLoginAutorization;
+    private javax.swing.JLabel lblLoginSignIn;
+    private javax.swing.JLabel lblLoginStatusAutorization;
+    private javax.swing.JLabel lblLoginStatusSignIn;
     private javax.swing.JLabel lblPassStatus;
-    private javax.swing.JLabel lblPassword;
+    private javax.swing.JLabel lblPassStatusSignIn;
+    private javax.swing.JLabel lblPasswordAutorization;
     private javax.swing.JPanel pnlAutorization;
-    private javax.swing.JPasswordField txtPassword;
+    private javax.swing.JPanel pnlSignIn;
+    private javax.swing.JPasswordField txtConfirmPasswordSignIn;
+    private javax.swing.JTextField txtLoginAutorization;
+    private javax.swing.JTextField txtLoginSignIn;
+    private javax.swing.JPasswordField txtPasswordAutorization;
+    private javax.swing.JPasswordField txtPasswordSignIn;
     // End of variables declaration//GEN-END:variables
 
-    private boolean checkLogInFields() {
-        if(lengthMaskString(ftxLogin.getText())>=3 && txtPassword.getText().length()>=3)
+    public boolean checkLogInFields() {
+        if(txtLoginAutorization.getText().length()>=3 && txtPasswordAutorization.getText().length()>=3)
             return true;
         return false;
     }
-
+    public String getLoginAtoutization(){
+        return this.txtLoginAutorization.getText();
+    }
+    public String getPasswordAtoutization(){
+        return this.txtPasswordAutorization.getText();
+    }
+    /*
     private void btnLogInIsVisible() {
         if(checkLogInFields())
             btnLogIn.setEnabled(true);
@@ -533,27 +371,71 @@ public class LogInUI extends javax.swing.JFrame {
 
     private void btnSignInIsVisible() {
         if(checkSignInFields())
-            jButton1.setEnabled(true);
+            btnSignIn.setEnabled(true);
         else 
-            jButton1.setEnabled(false);
+            btnSignIn.setEnabled(false);
     }
+    */
 
-    private boolean checkSignInFields() {
-        if(lengthMaskString(ftxLogin1.getText())>=3 && 
-                jPasswordField1.getText().length()>=3 &&
-                jPasswordField2.getText().length()>=3  &&
-                jPasswordField1.getText().equals(jPasswordField2.getText()) &&
-                jFormattedTextField1.isValid()) 
+    public boolean checkSignInFields() {
+        if(txtLoginSignIn.getText().length()>=3 && 
+                txtPasswordSignIn.getText().length()>=3 &&
+                txtConfirmPasswordSignIn.getText().length()>=3  &&
+                txtPasswordSignIn.getText().equals(txtConfirmPasswordSignIn.getText()) &&
+                ftxDriverLicense.isValid()) 
             return true;
         return false;
     }
     private void equalPass(){
-        if(jPasswordField2.getText().length()>=3 &&
-                !jPasswordField2.getText().equals(jPasswordField1.getText())){
-            lblPass2Status.setForeground(errorMess);
-            lblPass2Status.setText("Паролі не співпадають!");
+        if(txtConfirmPasswordSignIn.getText().length()>=3 &&
+                !txtConfirmPasswordSignIn.getText().equals(txtPasswordSignIn.getText())){
+            //lblConfirmPassStatusSignIn.setForeground(errorMess);
+            lblConfirmPassStatusSignIn.setText("Паролі не співпадають!");
         }
         else
-            lblPass2Status.setText("");
+            lblConfirmPassStatusSignIn.setText("");
+    }
+
+    private void setFieldFilters() throws ParseException {
+        String regular="^[a-zA-Z]+[a-zA-Z0-9_]*$";
+        AbstractDocument doc;
+        //fields for log in
+        doc = (AbstractDocument) txtLoginAutorization.getDocument();
+        doc.setDocumentFilter(new DocFilter(doc.getLength(), lenghtTxt,regular));
+        doc = (AbstractDocument) txtPasswordAutorization.getDocument();
+        doc.setDocumentFilter(new DocFilter(doc.getLength(), lenghtTxt,regular));
+        //fields for sing in
+        doc = (AbstractDocument) txtLoginSignIn.getDocument();
+        doc.setDocumentFilter(new DocFilter(doc.getLength(), lenghtTxt,regular));
+        doc = (AbstractDocument) txtPasswordSignIn.getDocument();
+        doc.setDocumentFilter(new DocFilter(doc.getLength(), lenghtTxt,regular));
+        doc = (AbstractDocument) txtConfirmPasswordSignIn.getDocument();
+        doc.setDocumentFilter(new DocFilter(doc.getLength(), lenghtTxt,regular));
+        //field for input driver's license
+        MaskFormatter driverMask=new MaskFormatter("UUU-######");
+        DefaultFormatterFactory formatterFactory = new DefaultFormatterFactory(driverMask);
+        ftxDriverLicense.setFormatterFactory(formatterFactory);
+    }
+
+    public void setLoginStatusAutorization(String mess, Color color){
+        this.lblLoginStatusAutorization.setForeground(color);
+        this.lblLoginStatusAutorization.setText(mess);
+    }
+    public void setPassworStatusdAutorization(String mess, Color color){
+        this.lblPassStatus.setForeground(color);
+        this.lblPassStatus.setText(mess);
+    }
+    private void addListenerForComponents() {
+        //for Log In window
+        this.txtLoginAutorization.setName("txtLoginAutorization");
+        this.txtLoginAutorization.addFocusListener(loginControl);
+        this.txtPasswordAutorization.setName("txtPasswordAutorization");
+        this.txtPasswordAutorization.addFocusListener(loginControl);
+        this.btnLogIn.setActionCommand("LogIn");
+        this.btnLogIn.addActionListener(loginControl);
+        //for Sign In window
+        this.btnSignIn.setActionCommand("SignIn");
+        this.btnSignIn.addActionListener(loginControl);
+        
     }
 }
