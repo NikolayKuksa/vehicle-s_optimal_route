@@ -73,6 +73,7 @@
                                           <Component id="lblConfirmPassStatusSignIn" min="-2" max="-2" attributes="0"/>
                                           <Component id="lblLoginStatusSignIn" alignment="0" min="-2" max="-2" attributes="0"/>
                                           <Component id="lblPassStatusSignIn" alignment="0" min="-2" max="-2" attributes="0"/>
+                                          <Component id="lblDriverLicenseStatus" alignment="0" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                   </Group>
                               </Group>
@@ -118,7 +119,10 @@
                       <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="ftxDriverLicense" min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="ftxDriverLicense" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="lblDriverLicenseStatus" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="btnSignIn" min="-2" max="-2" attributes="0"/>
                       <EmptySpace pref="65" max="32767" attributes="0"/>
@@ -161,6 +165,9 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="&#x420;&#x435;&#x454;&#x441;&#x442;&#x440;&#x430;&#x446;&#x456;&#x44f;"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSignInActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JLabel" name="jLabel2">
               <Properties>
@@ -169,6 +176,8 @@
               </Properties>
             </Component>
             <Component class="javax.swing.JTextField" name="txtLoginSignIn">
+            </Component>
+            <Component class="javax.swing.JLabel" name="lblDriverLicenseStatus">
             </Component>
           </SubComponents>
         </Container>

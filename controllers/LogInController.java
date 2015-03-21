@@ -48,8 +48,12 @@ public class LogInController implements ActionListener, FocusListener {
             } catch (SQLException ex) {
             Logger.getLogger(LogInController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        if(e.getActionCommand().equals("btnSignInAutorization"));
-            //form.setLoginStatusAutorization("");
+        if(e.getActionCommand().equals("SignIn"));
+        try {
+            signIn();
+        } catch (SQLException ex) {
+            Logger.getLogger(LogInController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @Override
@@ -65,20 +69,56 @@ public class LogInController implements ActionListener, FocusListener {
         JTextComponent txt=(JTextComponent) e.getComponent();
         System.out.println(txt.getText());
         ///txt.setText("loooooool");
+        String less3="не менше 3 знаків";
+        String ok="OK";
         int count=txt.getText().length();
         String name=e.getComponent().getName();
         switch(name){
                 case "txtLoginAutorization":
                     if(count<3)
-                        form.setLoginStatusAutorization("не менше 3 знаків",messERROR);
+                        form.setLoginStatusAutorization(less3,messERROR);
                     else
-                        form.setLoginStatusAutorization("OK",messOK);
+                        form.setLoginStatusAutorization(ok,messOK);
                     break;
                 case "txtPasswordAutorization":
                     if(count<3)
-                        form.setPassworStatusdAutorization("не менше 3 знаків",messERROR);
+                        form.setPassworStatusdAutorization(less3,messERROR);
                     else
-                        form.setPassworStatusdAutorization("OK",messOK);
+                        form.setPassworStatusdAutorization(ok,messOK);
+                    break;
+                case "txtLoginSignIn":
+                    if(count<3)
+                        form.setLoginStatusSignIn(less3, messERROR);
+                    else 
+                        form.setLoginStatusSignIn(ok, messOK);
+                    break;
+                case "txtPasswordSignIn":
+                    if(count<3)
+                        form.setPasswordStatusSignIn(less3, messERROR);
+                    else 
+                        form.setPasswordStatusSignIn(ok, messOK);
+                        if(!form.getConfirmPassowrd().equals(""))
+                            if(!form.getPasswordSignIn().equals(form.getConfirmPassowrd()))    
+                                form.setConfirmStatusSignIn("паролі не співпадають", messERROR);
+                            else
+                                form.setConfirmStatusSignIn("",messOK);
+                        else
+                            form.setConfirmStatusSignIn(ok,messOK);
+                    break;
+                case "txtConfirmPasswordSignIn":
+                    if(count<3)
+                        form.setConfirmStatusSignIn(less3, messERROR);
+                    else 
+                        if(form.getPasswordSignIn().equals(form.getConfirmPassowrd()))
+                            form.setConfirmStatusSignIn(ok, messOK);
+                        else 
+                            form.setConfirmStatusSignIn("паролі не співпадають", messERROR);
+                    break;
+                case "ftxDriverLicense":
+                    if(form.checkDriverLicense())
+                        form.setDriverLicenseStatus(ok, messOK);
+                    else 
+                        form.setDriverLicenseStatus("некоректне значення", messERROR);           
             }  
     }
 
@@ -95,9 +135,14 @@ public class LogInController implements ActionListener, FocusListener {
             System.out.println(result);
             switch(result){
                 case -1: //if user don't exist
-                    
+                    showMessageDialog(form,"Користувач з заданим логіном та паролем не зареєстрований в системі!"
+                            + "\n Перевірте введені дані або зареєструйтесь в системі.","Пошук оптимального маршрту. "
+                                    + "Авторизація користувача - Помилкові дані",ERROR_MESSAGE);
                     break;
                 case  0: //if typical user
+                    showMessageDialog(form, "Авторизація завершена успішно!\nДякуємо, що обрали нашу систему!", "Вітання",PLAIN_MESSAGE);
+                    form.hide();
+                    InputRouteUI.main(args);
                     break;
                 case  1: //if user is admin
                     break;
@@ -112,9 +157,41 @@ public class LogInController implements ActionListener, FocusListener {
             int n=showOptionDialog(null,"Would you like some green eggs to go with that ham?", "A Silly Question",
             YES_NO_CANCEL_OPTION,QUESTION_MESSAGE,null,options,options[2]);
             System.out.println(n);*/
-            showMessageDialog(form,"Eggs are not supposed to be green.","Inane error",ERROR_MESSAGE);
+            showMessageDialog(form,"Всі поля для вводу є обов'яковими для заповнення","Помилка",ERROR_MESSAGE);
         }
         //InputRouteUI.main(args);
+    }
+
+    private void signIn() throws SQLException {
+        if(form.checkSignInFields()){
+            Connection con=ConnectionToRDBMS.getDBConnection("MYKOLA_KUKSA", "MYKOLA_KUKSA");
+            CallableStatement stm=con.prepareCall("{? = call ADD_USER(?,?,?)}");
+            stm.registerOutParameter (1, Types.INTEGER);
+            stm.setString(2,form.getLoginSignIn());
+            stm.setString(3, form.getPasswordSignIn());
+            stm.setString(4,form.getDriverLicense());
+            stm.execute();
+            int result=stm.getInt(1);
+            stm.close();
+            System.out.println(result);
+            switch(result){
+                case -1: //if user login and password already exist
+                    showMessageDialog(null,"Нажаль, введені логін та пароль вже зайняті!"
+                            + "\n Введіть інші значення","Пошук оптимального маршрту. Реєстрація в системі - Перевірка логіну та паролю",ERROR_MESSAGE);
+                    break;
+                case  0: //if user does'n exist
+                    showMessageDialog(null, "Реєстрація успішно завершена!\nДякуємо, що обрали нашу систему!", "Вітання",PLAIN_MESSAGE);
+                    form.gotoLogInWindow();
+                    break;
+                case  1: //if driver license already exist
+                     showMessageDialog(null,"Водійське посвідчення з даною серією та номером вже зареєстроване в системі!"
+                            + "\nПеревітре правильність серії та номеру посвідчення",
+                             "Пошук оптимального маршрту. Реєстрація в системі - Перевірка водійського посвідчення",ERROR_MESSAGE);
+            }
+        }
+        else{
+            showMessageDialog(form,"Всі поля для вводу є обов'яковими для заповнення","Помилка",ERROR_MESSAGE);
+        }
     }
     
 }

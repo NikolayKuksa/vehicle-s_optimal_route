@@ -27,8 +27,7 @@ public class LogInUI extends javax.swing.JFrame {
         initComponents();
         setFieldFilters();
         loginControl=new LogInController(this);
-        addListenerForComponents();
-        
+        addListenerForComponents();  
     }
 
     /**
@@ -54,6 +53,7 @@ public class LogInUI extends javax.swing.JFrame {
         btnSignIn = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         txtLoginSignIn = new javax.swing.JTextField();
+        lblDriverLicenseStatus = new javax.swing.JLabel();
         pnlAutorization = new javax.swing.JPanel();
         lblLoginAutorization = new javax.swing.JLabel();
         lblPasswordAutorization = new javax.swing.JLabel();
@@ -88,6 +88,11 @@ public class LogInUI extends javax.swing.JFrame {
         jLabel5.setText("Серія та номер водійського посвідчення:");
 
         btnSignIn.setText("Реєстрація");
+        btnSignIn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSignInActionPerformed(evt);
+            }
+        });
 
         jLabel2.setText("Підтвердіть пароль");
         jLabel2.setToolTipText("");
@@ -115,7 +120,8 @@ public class LogInUI extends javax.swing.JFrame {
                                 .addGroup(pnlSignInLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(lblConfirmPassStatusSignIn)
                                     .addComponent(lblLoginStatusSignIn)
-                                    .addComponent(lblPassStatusSignIn)))))
+                                    .addComponent(lblPassStatusSignIn)
+                                    .addComponent(lblDriverLicenseStatus)))))
                     .addGroup(pnlSignInLayout.createSequentialGroup()
                         .addGap(131, 131, 131)
                         .addComponent(btnSignIn)))
@@ -148,7 +154,9 @@ public class LogInUI extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(ftxDriverLicense, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(pnlSignInLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(ftxDriverLicense, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblDriverLicenseStatus))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnSignIn)
                 .addContainerGap(65, Short.MAX_VALUE))
@@ -285,13 +293,40 @@ public class LogInUI extends javax.swing.JFrame {
     }//GEN-LAST:event_btnSignInAutorizationActionPerformed
 
     private void dlgSignInWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_dlgSignInWindowClosing
+        clearLogInWindow();
+        this.setVisible(true);  
+    }//GEN-LAST:event_dlgSignInWindowClosing
+
+    public void gotoLogInWindow(){
+        this.txtPasswordSignIn.setText("");
+        this.lblPassStatusSignIn.setText("");
+        this.txtPasswordSignIn.setText("");
+        this.lblConfirmPassStatusSignIn.setText("");
+        this.ftxDriverLicense.setText("");
+        this.lblDriverLicenseStatus.setText("");
+        this.dlgSignIn.setVisible(false);
+        clearLogInWindow();
         this.setVisible(true);
+    }
+    
+    public void clearLogInWindow(){
         this.txtLoginAutorization.setText("");
         this.txtPasswordAutorization.setText("");
         this.lblLoginStatusAutorization.setText("");
-        this.lblPassStatus.setText(null);
-    }//GEN-LAST:event_dlgSignInWindowClosing
+        this.lblPassStatus.setText(null);;
+    }
+    private void btnSignInActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSignInActionPerformed
 
+    }//GEN-LAST:event_btnSignInActionPerformed
+    public boolean checkDriverLicense(){
+        boolean flag=true;
+        try {
+            this.ftxDriverLicense.commitEdit();
+        } catch (ParseException ex) {
+            flag=false;
+        }
+        return flag;
+    }
     /**
      * @param args the command line arguments
      */
@@ -334,6 +369,7 @@ public class LogInUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel lblConfirmPassStatusSignIn;
+    private javax.swing.JLabel lblDriverLicenseStatus;
     private javax.swing.JLabel lblLoginAutorization;
     private javax.swing.JLabel lblLoginSignIn;
     private javax.swing.JLabel lblLoginStatusAutorization;
@@ -361,39 +397,27 @@ public class LogInUI extends javax.swing.JFrame {
     public String getPasswordAtoutization(){
         return this.txtPasswordAutorization.getText();
     }
-    /*
-    private void btnLogInIsVisible() {
-        if(checkLogInFields())
-            btnLogIn.setEnabled(true);
-        else 
-            btnLogIn.setEnabled(false);
+    public String getLoginSignIn(){
+        return this.txtLoginSignIn.getText();
     }
-
-    private void btnSignInIsVisible() {
-        if(checkSignInFields())
-            btnSignIn.setEnabled(true);
-        else 
-            btnSignIn.setEnabled(false);
+    public String getPasswordSignIn(){
+        return this.txtPasswordSignIn.getText();
     }
-    */
+    public String getConfirmPassowrd(){
+        return this.txtConfirmPasswordSignIn.getText();
+    }
+    public String getDriverLicense(){
+        return this.ftxDriverLicense.getText();
+    }
 
     public boolean checkSignInFields() {
         if(txtLoginSignIn.getText().length()>=3 && 
                 txtPasswordSignIn.getText().length()>=3 &&
                 txtConfirmPasswordSignIn.getText().length()>=3  &&
                 txtPasswordSignIn.getText().equals(txtConfirmPasswordSignIn.getText()) &&
-                ftxDriverLicense.isValid()) 
+                checkDriverLicense()) 
             return true;
         return false;
-    }
-    private void equalPass(){
-        if(txtConfirmPasswordSignIn.getText().length()>=3 &&
-                !txtConfirmPasswordSignIn.getText().equals(txtPasswordSignIn.getText())){
-            //lblConfirmPassStatusSignIn.setForeground(errorMess);
-            lblConfirmPassStatusSignIn.setText("Паролі не співпадають!");
-        }
-        else
-            lblConfirmPassStatusSignIn.setText("");
     }
 
     private void setFieldFilters() throws ParseException {
@@ -425,6 +449,22 @@ public class LogInUI extends javax.swing.JFrame {
         this.lblPassStatus.setForeground(color);
         this.lblPassStatus.setText(mess);
     }
+    public void setLoginStatusSignIn(String mess, Color color){
+        this.lblLoginStatusSignIn.setForeground(color);
+        this.lblLoginStatusSignIn.setText(mess);
+    }
+    public void setPasswordStatusSignIn(String mess, Color color){
+        this.lblPassStatusSignIn.setForeground(color);
+        this.lblPassStatusSignIn.setText(mess);
+    }
+    public void setConfirmStatusSignIn(String mess, Color color){
+        this.lblConfirmPassStatusSignIn.setForeground(color);
+        this.lblConfirmPassStatusSignIn.setText(mess);
+    }
+    public void setDriverLicenseStatus(String mess, Color color){
+        this.lblDriverLicenseStatus.setForeground(color);
+        this.lblDriverLicenseStatus.setText(mess);
+    }
     private void addListenerForComponents() {
         //for Log In window
         this.txtLoginAutorization.setName("txtLoginAutorization");
@@ -436,6 +476,13 @@ public class LogInUI extends javax.swing.JFrame {
         //for Sign In window
         this.btnSignIn.setActionCommand("SignIn");
         this.btnSignIn.addActionListener(loginControl);
-        
+        this.txtLoginSignIn.setName("txtLoginSignIn");
+        this.txtLoginSignIn.addFocusListener(loginControl);
+        this.txtPasswordSignIn.setName("txtPasswordSignIn");
+        this.txtPasswordSignIn.addFocusListener(loginControl);
+        this.txtConfirmPasswordSignIn.setName("txtConfirmPasswordSignIn");
+        this.txtConfirmPasswordSignIn.addFocusListener(loginControl);
+        this.ftxDriverLicense.setName("ftxDriverLicense");
+        this.ftxDriverLicense.addFocusListener(loginControl);
     }
 }
