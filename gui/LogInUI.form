@@ -339,6 +339,9 @@
             <Property name="text" type="java.lang.String" value="&#x410;&#x432;&#x442;&#x43e;&#x440;&#x438;&#x437;&#x430;&#x446;&#x456;&#x44f;"/>
             <Property name="actionCommand" type="java.lang.String" value=""/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnLogInActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="btnSignInAutorization">
           <Properties>

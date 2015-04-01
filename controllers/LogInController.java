@@ -48,7 +48,7 @@ public class LogInController implements ActionListener, FocusListener {
             } catch (SQLException ex) {
             Logger.getLogger(LogInController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        if(e.getActionCommand().equals("SignIn"));
+        if(e.getActionCommand().equals("SignIn"))
         try {
             signIn();
         } catch (SQLException ex) {
@@ -97,13 +97,11 @@ public class LogInController implements ActionListener, FocusListener {
                         form.setPasswordStatusSignIn(less3, messERROR);
                     else 
                         form.setPasswordStatusSignIn(ok, messOK);
-                        if(!form.getConfirmPassowrd().equals(""))
-                            if(!form.getPasswordSignIn().equals(form.getConfirmPassowrd()))    
-                                form.setConfirmStatusSignIn("паролі не співпадають", messERROR);
-                            else
-                                form.setConfirmStatusSignIn("",messOK);
+                    if(!form.getConfirmPassowrd().equals(""))
+                        if(!form.getPasswordSignIn().equals(form.getConfirmPassowrd()))    
+                            form.setConfirmStatusSignIn("паролі не співпадають", messERROR);
                         else
-                            form.setConfirmStatusSignIn(ok,messOK);
+                            form.setConfirmStatusSignIn("",messOK);
                     break;
                 case "txtConfirmPasswordSignIn":
                     if(count<3)
@@ -138,14 +136,19 @@ public class LogInController implements ActionListener, FocusListener {
                     showMessageDialog(form,"Користувач з заданим логіном та паролем не зареєстрований в системі!"
                             + "\n Перевірте введені дані або зареєструйтесь в системі.","Пошук оптимального маршрту. "
                                     + "Авторизація користувача - Помилкові дані",ERROR_MESSAGE);
-                    break;
+                    return;
                 case  0: //if typical user
                     showMessageDialog(form, "Авторизація завершена успішно!\nДякуємо, що обрали нашу систему!", "Вітання",PLAIN_MESSAGE);
                     form.hide();
-                    InputRouteUI.main(args);
-                    break;
+                    String [] arg=new String [2];
+                    arg[0]=form.getLoginAtoutization();
+                    arg[1]=form.getPasswordAtoutization();
+                    InputRouteUI.main(arg);
+                    return;
                 case  1: //if user is admin
-                    break;
+                    String [] args=new String[1];
+                    Admin.main(args);
+                    return;
             }
         }
         else{

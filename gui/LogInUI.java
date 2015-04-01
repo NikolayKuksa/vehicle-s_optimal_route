@@ -198,6 +198,11 @@ public class LogInUI extends javax.swing.JFrame {
 
         btnLogIn.setText("Авторизація");
         btnLogIn.setActionCommand("");
+        btnLogIn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLogInActionPerformed(evt);
+            }
+        });
 
         btnSignInAutorization.setFont(new java.awt.Font("Tahoma", 2, 11)); // NOI18N
         btnSignInAutorization.setText("Реєстрація");
@@ -318,6 +323,10 @@ public class LogInUI extends javax.swing.JFrame {
     private void btnSignInActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSignInActionPerformed
 
     }//GEN-LAST:event_btnSignInActionPerformed
+
+    private void btnLogInActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogInActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnLogInActionPerformed
     public boolean checkDriverLicense(){
         boolean flag=true;
         try {
