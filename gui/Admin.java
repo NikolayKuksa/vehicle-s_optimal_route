@@ -5,19 +5,95 @@
  */
 package gui;
 
+import java.awt.Color;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Types;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import static javax.swing.JOptionPane.ERROR_MESSAGE;
+import static javax.swing.JOptionPane.PLAIN_MESSAGE;
+import static javax.swing.JOptionPane.showMessageDialog;
+import javax.swing.table.DefaultTableModel;
+import src.ConnectionToRDBMS;
+
 /**
  *
  * @author Николай
  */
 public class Admin extends javax.swing.JFrame {
-
+    private DefaultTableModel model;
+    private Color errorMess=new Color(255,0,51);
+    private Color typical=new Color(0,0,0);
+    private Connection conn;
     /**
      * Creates new form Admin
      */
     public Admin() {
         initComponents();
+        conn=ConnectionToRDBMS.getDBuserConnection();
+        model =(DefaultTableModel) jTable1.getModel();
+        jTable1.setSelectionMode(NORMAL);
+        jTable1.getTableHeader().setReorderingAllowed(false);
+        try {
+            displayPOINT();
+        } catch (SQLException ex) {
+            Logger.getLogger(Admin.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
-
+    private void displayPOINT() throws SQLException{
+        while(model.getRowCount()>0){
+            model.removeRow(model.getRowCount()-1);
+        }
+        Statement stm=conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_UPDATABLE);
+        ResultSet rs=stm.executeQuery("select * from REP_POINT ORDER BY geo_x,geo_y"); 
+       
+        while (rs.next()) {
+            String temp;
+            if(rs.getString(5)!=null)
+                temp=rs.getString(5).replaceAll("   ", "");
+            else temp="";
+            model.addRow(new Object[]{rs.getString(1).replaceAll(" ", ""),rs.getString(2).replaceAll(" ", ""),rs.getString(3).replaceAll(" ", ""),
+                rs.getString(4).replaceAll(" ", ""),Float.toString(rs.getFloat(6)),Float.toString(rs.getFloat(7)),temp});
+        }
+        stm.close();
+        this.jTable1.updateUI();
+    }
+    
+    private int updatePoint(float x,float y,String country,String city,String street,String house,String desc) throws SQLException{
+        CallableStatement stm=conn.prepareCall("{? = call UPDATE_REP_POINT(?,?,?,?,?,?,?)}");
+            stm.registerOutParameter (1, Types.INTEGER);
+            stm.setFloat(2, x);
+            stm.setFloat(3,y);
+            stm.setString(4,country);
+            stm.setString(5, city);
+            stm.setString(6, street);
+            stm.setString(7,house);
+            stm.setString(8,desc);
+            stm.execute();
+            int result=stm.getInt(1);
+            stm.close();
+            return result;
+    }
+    
+    private int addPoint(String country,String city,String street,String house,String desc, String x,String y) throws SQLException{
+        CallableStatement stm=conn.prepareCall("{? = call ADD_REP_POINT(?,?,?,?,?,?,?)}");
+            stm.registerOutParameter (1, Types.INTEGER);
+            stm.setString(2, country);
+            stm.setString(3, city);
+            stm.setString(4, street);
+            stm.setString(5,house);
+            stm.setString(6,desc);
+            stm.setFloat(7,Float.parseFloat(x));
+            stm.setFloat(8,Float.parseFloat(y));
+            stm.execute();
+            int result=stm.getInt(1);
+            stm.close();
+            return result;
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -27,23 +103,326 @@ public class Admin extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jDialog1 = new javax.swing.JDialog();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        jTextField1 = new javax.swing.JTextField();
+        jTextField2 = new javax.swing.JTextField();
+        jTextField3 = new javax.swing.JTextField();
+        jTextField4 = new javax.swing.JTextField();
+        jTextField5 = new javax.swing.JTextField();
+        btnActionPoint = new javax.swing.JButton();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        jTextField6 = new javax.swing.JTextField();
+        jTextField7 = new javax.swing.JTextField();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
+        btnAddPoint = new javax.swing.JButton();
+        btnEditPoint = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
+
+        jDialog1.setMinimumSize(new java.awt.Dimension(313, 469));
+        jDialog1.setModal(true);
+
+        jLabel1.setText("Країна");
+
+        jLabel2.setText("Місто");
+
+        jLabel3.setText("Вулиця");
+
+        jLabel4.setText("Номер будинку");
+
+        jLabel5.setText("Опис ");
+
+        btnActionPoint.setText("OK");
+        btnActionPoint.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnActionPointActionPerformed(evt);
+            }
+        });
+
+        jLabel6.setText("Широта");
+
+        jLabel7.setText("Довгота");
+
+        javax.swing.GroupLayout jDialog1Layout = new javax.swing.GroupLayout(jDialog1.getContentPane());
+        jDialog1.getContentPane().setLayout(jDialog1Layout);
+        jDialog1Layout.setHorizontalGroup(
+            jDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jDialog1Layout.createSequentialGroup()
+                .addGap(28, 28, 28)
+                .addGroup(jDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel4)
+                    .addComponent(jLabel5)
+                    .addComponent(jLabel6)
+                    .addComponent(jLabel1)
+                    .addComponent(jLabel2)
+                    .addComponent(jLabel7)
+                    .addComponent(jLabel3))
+                .addGap(18, 18, 18)
+                .addGroup(jDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(jTextField7)
+                    .addComponent(jTextField6)
+                    .addComponent(jTextField5)
+                    .addComponent(jTextField4)
+                    .addComponent(jTextField3)
+                    .addComponent(jTextField2)
+                    .addComponent(jTextField1))
+                .addGap(87, 87, 87))
+            .addGroup(javax.swing.GroupLayout.Alignment.CENTER, jDialog1Layout.createSequentialGroup()
+                .addGap(151, 151, 151)
+                .addComponent(btnActionPoint)
+                .addGap(115, 115, 115))
+        );
+        jDialog1Layout.setVerticalGroup(
+            jDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jDialog1Layout.createSequentialGroup()
+                .addGap(24, 24, 24)
+                .addGroup(jDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel5)
+                    .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel6)
+                    .addComponent(jTextField6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jDialog1Layout.createSequentialGroup()
+                        .addGap(11, 11, 11)
+                        .addComponent(jLabel7))
+                    .addGroup(jDialog1Layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jTextField7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 178, Short.MAX_VALUE)
+                .addComponent(btnActionPoint)
+                .addGap(36, 36, 36))
+        );
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Admin");
+        setTitle("Пошук оптимального маршруту - Редагування географічних точок - Вікно адміністратора");
+
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null}
+            },
+            new String [] {
+                "Країна", "Місто", "Вулиця", "Номер будинку", "Широта", "Довгота", "Опис"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane1.setViewportView(jTable1);
+
+        btnAddPoint.setText("Додати");
+        btnAddPoint.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddPointActionPerformed(evt);
+            }
+        });
+
+        btnEditPoint.setText("Редагувати");
+        btnEditPoint.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditPointActionPerformed(evt);
+            }
+        });
+
+        jButton3.setText("Додати на основі виділеної точки");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 712, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(btnEditPoint)
+                        .addGap(18, 18, 18)
+                        .addComponent(jButton3)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnAddPoint)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 282, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnAddPoint)
+                    .addComponent(btnEditPoint)
+                    .addComponent(jButton3))
+                .addGap(16, 16, 16))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnAddPointActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddPointActionPerformed
+        this.btnActionPoint.setActionCommand("insert");
+        jTextField1.setText("");
+        jTextField2.setText("");
+        jTextField3.setText("");
+        jTextField4.setText("");
+        jTextField5.setText("");
+        jTextField6.setText("");
+        jTextField7.setText("");
+        setMax();
+        this.jDialog1.setVisible(true);
+                try {
+            displayPOINT();
+        } catch (SQLException ex) {
+            Logger.getLogger(Admin.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_btnAddPointActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        int row=jTable1.getSelectedRow();
+        if(row==-1){
+               showMessageDialog(this,"Не обрано автомобіль",
+                             "Пошук оптимального маршрту. Редактування автомобілів",ERROR_MESSAGE);
+               return;
+        }
+        this.btnActionPoint.setActionCommand("insert");
+        jTextField1.setText(jTable1.getValueAt(row, 0).toString());
+        jTextField2.setText(jTable1.getValueAt(row, 1).toString());
+        jTextField3.setText(jTable1.getValueAt(row, 2).toString());
+        jTextField4.setText(jTable1.getValueAt(row, 3).toString());
+        if(jTable1.getValueAt(row, 6)!=null)
+            jTextField5.setText(jTable1.getValueAt(row, 6).toString().replaceAll("   ", ""));
+        else 
+            jTextField5.setText("");
+        jTextField6.setText(jTable1.getValueAt(row, 4).toString());
+        jTextField7.setText(jTable1.getValueAt(row, 5).toString());
+        setMax();
+        this.jDialog1.setVisible(true);
+                try {
+            displayPOINT();
+        } catch (SQLException ex) {
+            Logger.getLogger(Admin.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void btnEditPointActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditPointActionPerformed
+        int row=jTable1.getSelectedRow();
+        if(row==-1){
+               showMessageDialog(this,"Не обрано автомобіль",
+                             "Пошук оптимального маршрту. Редактування автомобілів",ERROR_MESSAGE);
+               return;
+        }
+        this.btnActionPoint.setActionCommand("update");
+        jTextField1.setText(jTable1.getValueAt(row, 0).toString());
+        jTextField2.setText(jTable1.getValueAt(row, 1).toString());
+        jTextField3.setText(jTable1.getValueAt(row, 2).toString());
+        jTextField4.setText(jTable1.getValueAt(row, 3).toString());
+        if(jTable1.getValueAt(row, 6)!=null)
+            jTextField5.setText(jTable1.getValueAt(row, 6).toString().replaceAll("   ", ""));
+        else 
+            jTextField5.setText("");jTextField6.setText(jTable1.getValueAt(row, 4).toString());
+        jTextField7.setText(jTable1.getValueAt(row, 5).toString());
+        setMin();
+        this.jDialog1.setVisible(true);
+        try {
+            displayPOINT();
+        } catch (SQLException ex) {
+            Logger.getLogger(Admin.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_btnEditPointActionPerformed
+
+    private void btnActionPointActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActionPointActionPerformed
+        int row=jTable1.getSelectedRow();
+        int result=0;
+        switch(evt.getActionCommand()){
+            case "insert":
+                try {
+                    result=addPoint(jTextField1.getText(),jTextField2.getText(),jTextField3.getText(),
+                        jTextField4.getText(),jTextField5.getText(),jTextField6.getText(),jTextField7.getText());
+                } catch (SQLException ex) {
+                    Logger.getLogger(InputRouteUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            break;
+            case "update":
+                float x=Float.parseFloat(model.getValueAt(row,4).toString());
+                float y=Float.parseFloat(model.getValueAt(row,5).toString());
+                    try {
+                    result=updatePoint(x,y,jTextField1.getText(),
+                            jTextField2.getText(),jTextField3.getText(),jTextField4.getText(),jTextField5.getText());
+                } catch (SQLException ex) {
+                    Logger.getLogger(InputRouteUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+        }
+        if(result==0){
+                showMessageDialog(jDialog1,"Операція виконана успішно", "Редагування автомобілів",PLAIN_MESSAGE);
+                this.jDialog1.setVisible(false);
+            }
+        else{
+            showMessageDialog(jDialog1,"error",
+                             "er",ERROR_MESSAGE);
+            return;
+            }
+        try {
+            this.displayPOINT();
+        } catch (SQLException ex) {
+            Logger.getLogger(InputRouteUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_btnActionPointActionPerformed
+    private void setMin(){
+        this.jLabel6.setVisible(false);
+        this.jTextField6.setVisible(false);
+        this.jLabel7.setVisible(false);
+        this.jTextField7.setVisible(false);
+    }
+    
+    private void setMax(){
+        this.jLabel6.setVisible(true);
+        this.jTextField6.setVisible(true);
+        this.jLabel7.setVisible(true);
+        this.jTextField7.setVisible(true);
+    }
     /**
      * @param args the command line arguments
      */
@@ -80,5 +459,26 @@ public class Admin extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnActionPoint;
+    private javax.swing.JButton btnAddPoint;
+    private javax.swing.JButton btnEditPoint;
+    private javax.swing.JButton jButton3;
+    private javax.swing.JDialog jDialog1;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable jTable1;
+    private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField jTextField2;
+    private javax.swing.JTextField jTextField3;
+    private javax.swing.JTextField jTextField4;
+    private javax.swing.JTextField jTextField5;
+    private javax.swing.JTextField jTextField6;
+    private javax.swing.JTextField jTextField7;
     // End of variables declaration//GEN-END:variables
 }

@@ -22,6 +22,14 @@ import static javax.swing.JOptionPane.showMessageDialog;
 import static javax.swing.JOptionPane.showOptionDialog;
 import javax.swing.table.DefaultTableModel;
 import src.ConnectionToRDBMS;
+import controllers.ComboListener;
+import static java.sql.Connection.TRANSACTION_READ_COMMITTED;
+import static java.sql.Connection.TRANSACTION_SERIALIZABLE;
+import javax.swing.DefaultListModel;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import oracle.jdbc.OracleTypes;
 
 /**
  *
@@ -36,14 +44,23 @@ public class InputRouteUI extends javax.swing.JFrame {
     private static String userPass;
     private static String userDriverLicense;
     private ResultSet userCars;
+    private DefaultListModel listmodel;
     
     /**
      * Creates new form f2
      */
     public InputRouteUI() throws SQLException {
         initComponents();
+
+        jList2.setSelectionMode(0);
+        listmodel = new DefaultListModel();
+        addRouteStructureListener();
+
         conn=ConnectionToRDBMS.getDBuserConnection();
+        DatabaseMetaData dbMetaData = conn.getMetaData();
+        System.out.println(dbMetaData.supportsTransactions());
         model =(DefaultTableModel) jTable1.getModel();
+        
         Statement stm=conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_UPDATABLE);
         ResultSet rs=stm.executeQuery("select driver_license from driver where login='"+userLogin+"' and password='"+userPass+"'");
         rs.next();
@@ -53,8 +70,20 @@ public class InputRouteUI extends javax.swing.JFrame {
         jTable1.setSelectionMode(NORMAL);
         jTable1.getTableHeader().setReorderingAllowed(false);
         nonCar();
+        updateMyRoute();
         
-        jList2.setSelectedIndex(0);
+        ComboListener cl=new ComboListener(this); 
+        this.cmbListRoutes.addActionListener(cl);
+        this.jComboBox1.addActionListener(cl);
+        this.jComboBox2.addActionListener(cl);
+        this.jComboBox3.addActionListener(cl);
+        this.jComboBox4.addActionListener(cl);
+        
+        initUpdateCombo();
+        //jList2.setSelectedIndex(0);
+       
+
+        System.out.println(conn.getAutoCommit()+"||"+conn.getTransactionIsolation());
     }
 
     /**
@@ -65,7 +94,8 @@ public class InputRouteUI extends javax.swing.JFrame {
     private void updateCarMenu() throws SQLException{
         jMenu3.removeAll();
         JMenuItem m;
-        
+        conn.setAutoCommit(false);
+        conn.setReadOnly(true);
         Statement stm=conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_UPDATABLE);
         ResultSet rs=stm.executeQuery("select CAR_NAME,CAR_NUMBER from CAR where driver_license='"+userDriverLicense+"'"); 
         while (rs.next()) {
@@ -78,16 +108,13 @@ public class InputRouteUI extends javax.swing.JFrame {
         });
         jMenu3.add(m);
         }
+        conn.commit();
+        conn.setAutoCommit(true);
         stm.close();
     }
     private void jMenuSelectCarActionPerformed(ActionEvent evt) {
         selectCar(evt.getActionCommand());        
-        /*if(evt.getActionCommand().equals("Car1"))
-                    selectCar("Car1");
-                if(evt.getActionCommand().equals("Car2"))
-                    selectCar("Car2");
-                */
-            }
+    }
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -127,13 +154,12 @@ public class InputRouteUI extends javax.swing.JFrame {
         jLabel10 = new javax.swing.JLabel();
         jTextField8 = new javax.swing.JTextField();
         btnChangeTableCar = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
         pnlRoute = new javax.swing.JPanel();
         pnlMyRoutes = new javax.swing.JPanel();
         cmbListRoutes = new javax.swing.JComboBox();
         lblListRoutes = new javax.swing.JLabel();
         btnDeleteRoute = new javax.swing.JButton();
-        btnAddRoute = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
         pnlNewRoute = new javax.swing.JPanel();
         lblRouteName = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
@@ -143,13 +169,16 @@ public class InputRouteUI extends javax.swing.JFrame {
         lblCountry = new javax.swing.JLabel();
         jComboBox3 = new javax.swing.JComboBox();
         jComboBox1 = new javax.swing.JComboBox();
-        jComboBox2 = new javax.swing.JComboBox();
         jComboBox4 = new javax.swing.JComboBox();
+        jComboBox2 = new javax.swing.JComboBox();
+        btnEditCurPoint = new javax.swing.JButton();
         jTextField1 = new javax.swing.JTextField();
+        btnChangeRouteName = new javax.swing.JButton();
         lblCurRoute = new javax.swing.JLabel();
         jScrollPane4 = new javax.swing.JScrollPane();
         jList2 = new javax.swing.JList();
         jButton7 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
         btnBuildOptimalRoute = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
@@ -344,7 +373,7 @@ public class InputRouteUI extends javax.swing.JFrame {
         );
 
         jDialog1.setLocationByPlatform(true);
-        jDialog1.setMinimumSize(new java.awt.Dimension(400, 328));
+        jDialog1.setMinimumSize(new java.awt.Dimension(400, 370));
         jDialog1.setModal(true);
 
         jLabel4.setText("Назва авто");
@@ -438,10 +467,12 @@ public class InputRouteUI extends javax.swing.JFrame {
                 .addGroup(jDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel10)
                     .addComponent(jTextField8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(34, 34, 34)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 103, Short.MAX_VALUE)
                 .addComponent(btnChangeTableCar)
-                .addContainerGap(69, Short.MAX_VALUE))
+                .addGap(42, 42, 42))
         );
+
+        jButton2.setText("jButton2");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Пошук оптимального маршруту - Вибір автомобіля, маршруту");
@@ -452,8 +483,6 @@ public class InputRouteUI extends javax.swing.JFrame {
 
         pnlMyRoutes.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "Мої маршрути", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION));
 
-        cmbListRoutes.setEditable(true);
-        cmbListRoutes.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Новий маршрут", "Item 1", "Item 2", "Item 3", "Item 4" }));
         cmbListRoutes.setMinimumSize(new java.awt.Dimension(6, 20));
         cmbListRoutes.setPreferredSize(new java.awt.Dimension(10, 20));
         cmbListRoutes.addActionListener(new java.awt.event.ActionListener() {
@@ -466,18 +495,11 @@ public class InputRouteUI extends javax.swing.JFrame {
 
         btnDeleteRoute.setText("Видалити виділений маршрут ");
         btnDeleteRoute.setActionCommand("Видалити поточний маршрут");
-
-        btnAddRoute.setText("Зберегти поточний маршрут");
-        btnAddRoute.addActionListener(new java.awt.event.ActionListener() {
+        btnDeleteRoute.setMaximumSize(new java.awt.Dimension(200, 23));
+        btnDeleteRoute.setMinimumSize(new java.awt.Dimension(200, 23));
+        btnDeleteRoute.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnAddRouteActionPerformed(evt);
-            }
-        });
-
-        jButton2.setText("jButton2");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                btnDeleteRouteActionPerformed(evt);
             }
         });
 
@@ -494,14 +516,8 @@ public class InputRouteUI extends javax.swing.JFrame {
                         .addGap(0, 74, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlMyRoutesLayout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
-                        .addGroup(pnlMyRoutesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(btnAddRoute, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnDeleteRoute, javax.swing.GroupLayout.DEFAULT_SIZE, 191, Short.MAX_VALUE))))
+                        .addComponent(btnDeleteRoute, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlMyRoutesLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton2)
-                .addGap(102, 102, 102))
         );
         pnlMyRoutesLayout.setVerticalGroup(
             pnlMyRoutesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -510,16 +526,12 @@ public class InputRouteUI extends javax.swing.JFrame {
                 .addComponent(lblListRoutes)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cmbListRoutes, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jButton2)
-                .addGap(18, 18, 18)
-                .addComponent(btnDeleteRoute)
-                .addGap(18, 18, 18)
-                .addComponent(btnAddRoute)
+                .addGap(59, 59, 59)
+                .addComponent(btnDeleteRoute, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        pnlNewRoute.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "Поточний маршрут", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION));
+        pnlNewRoute.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "Редагування поточного маршруту", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION));
 
         lblRouteName.setText("Назва маршруту");
 
@@ -533,17 +545,20 @@ public class InputRouteUI extends javax.swing.JFrame {
 
         lblCountry.setText("Країна");
 
-        jComboBox3.setEditable(true);
         jComboBox3.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
-        jComboBox1.setEditable(true);
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
-        jComboBox2.setEditable(true);
+        jComboBox4.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
         jComboBox2.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
-        jComboBox4.setEditable(true);
-        jComboBox4.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        btnEditCurPoint.setText("Підтвердити зміни поточної точки ");
+        btnEditCurPoint.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditCurPointActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -552,16 +567,21 @@ public class InputRouteUI extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblHouse)
-                    .addComponent(lblCountry)
-                    .addComponent(lblCity)
-                    .addComponent(lblStreet))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jComboBox3, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jComboBox2, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jComboBox4, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblHouse)
+                            .addComponent(lblCountry)
+                            .addComponent(lblCity)
+                            .addComponent(lblStreet))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jComboBox3, javax.swing.GroupLayout.Alignment.TRAILING, 0, 156, Short.MAX_VALUE)
+                            .addComponent(jComboBox1, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jComboBox4, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jComboBox2, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(btnEditCurPoint)))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -570,21 +590,29 @@ public class InputRouteUI extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblCountry)
-                    .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblCity)
                     .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblCity, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jComboBox2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblStreet)
-                    .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblHouse)
                     .addComponent(jComboBox4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(11, 11, 11))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnEditCurPoint))
         );
+
+        btnChangeRouteName.setText("OK");
+        btnChangeRouteName.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnChangeRouteNameActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout pnlNewRouteLayout = new javax.swing.GroupLayout(pnlNewRoute);
         pnlNewRoute.setLayout(pnlNewRouteLayout);
@@ -596,7 +624,9 @@ public class InputRouteUI extends javax.swing.JFrame {
                     .addGroup(pnlNewRouteLayout.createSequentialGroup()
                         .addComponent(lblRouteName)
                         .addGap(18, 18, 18)
-                        .addComponent(jTextField1))
+                        .addComponent(jTextField1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnChangeRouteName))
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -606,13 +636,14 @@ public class InputRouteUI extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(pnlNewRouteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblRouteName)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnChangeRouteName))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(13, Short.MAX_VALUE))
         );
 
-        lblCurRoute.setText("Поточний введений маршрут:");
+        lblCurRoute.setText("Поточний маршрут:");
 
         jList2.setModel(new javax.swing.AbstractListModel() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
@@ -628,6 +659,13 @@ public class InputRouteUI extends javax.swing.JFrame {
             }
         });
 
+        jButton4.setText("Додати");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout pnlRouteLayout = new javax.swing.GroupLayout(pnlRoute);
         pnlRoute.setLayout(pnlRouteLayout);
         pnlRouteLayout.setHorizontalGroup(
@@ -635,14 +673,16 @@ public class InputRouteUI extends javax.swing.JFrame {
             .addGroup(pnlRouteLayout.createSequentialGroup()
                 .addGap(10, 10, 10)
                 .addComponent(lblCurRoute)
-                .addContainerGap(473, Short.MAX_VALUE))
+                .addContainerGap(525, Short.MAX_VALUE))
             .addGroup(pnlRouteLayout.createSequentialGroup()
                 .addGroup(pnlRouteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pnlRouteLayout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jScrollPane4)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(pnlRouteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jButton7, javax.swing.GroupLayout.DEFAULT_SIZE, 121, Short.MAX_VALUE)
+                            .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(pnlRouteLayout.createSequentialGroup()
                         .addGap(10, 10, 10)
                         .addComponent(pnlMyRoutes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -662,7 +702,9 @@ public class InputRouteUI extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnlRouteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pnlRouteLayout.createSequentialGroup()
-                        .addGap(34, 63, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
+                        .addComponent(jButton4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton7))
                     .addGroup(pnlRouteLayout.createSequentialGroup()
                         .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
@@ -768,6 +810,9 @@ public class InputRouteUI extends javax.swing.JFrame {
         while(model.getRowCount()>0){
             model.removeRow(model.getRowCount()-1);
         }
+        System.out.println(conn.isReadOnly());
+        conn.setAutoCommit(false);
+        conn.setReadOnly(true);
         Statement stm=conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_UPDATABLE);
         ResultSet rs=stm.executeQuery("select * from CAR_PETROL where driver_license='"+userDriverLicense+"'");
         userCars=rs; 
@@ -776,6 +821,9 @@ public class InputRouteUI extends javax.swing.JFrame {
             model.addRow(new Object[]{rs.getString(2).replaceAll(" ", ""),rs.getString(3).replaceAll(" ", ""),rs.getString(4).replaceAll(" ", ""),
                 rs.getString(5).replaceAll(" ", ""),rs.getString(6).replaceAll(" ", ""),rs.getString(7).replaceAll(" ", ""),rs.getString(8).replaceAll(" ", "")});
         }
+        conn.commit();
+        conn.setAutoCommit(true);
+//!!!!!!!!!!!!!!!!!!!!!!!!conn.setTransactionIsolation(TRANSACTION_READ_COMMITTED);System.out.println(conn.isReadOnly());
         stm.close();
     }
     //add car
@@ -793,25 +841,33 @@ public class InputRouteUI extends javax.swing.JFrame {
 
     private void btnDeleteCarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteCarActionPerformed
         
-        int row=jTable1.getSelectedRow();System.out.println(row);///return;
+        int row=jTable1.getSelectedRow();System.out.println(row);
         if(row==-1){
                showMessageDialog(jDialog2,"Не обрано автомобіль",
-                             "Пошук оптимального маршрту. Редактування автомобілів",ERROR_MESSAGE);
+                             "Пошук оптимального маршрту. Редагування автомобілів",ERROR_MESSAGE);
                return;
         }System.out.println(model.getRowCount());
-        Object[] options = {"Yes, please",
-                    "No, thanks"};
-            int n=showOptionDialog(jDialog2,"Would you like some green eggs to go with that ham?", "A Silly Question",
+        Object[] options = {"Підтвердити видалення",
+                    "Відмінити"};
+            int n=showOptionDialog(jDialog2,"Ви дійсно бажаєте видалити даний автомобіль?", "Підтвердження видалення",
             YES_NO_CANCEL_OPTION,QUESTION_MESSAGE,null,options,options[1]);
         if(n!=0)
             return;
+
         try {
+            conn.setAutoCommit(false);
+            conn.setTransactionIsolation(TRANSACTION_SERIALIZABLE);
             CallableStatement stm=conn.prepareCall("{? = call DELETE_CAR(?,?)}");
             stm.registerOutParameter (1, Types.INTEGER);
             stm.setString(2, userDriverLicense);
             stm.setString(3, (String) model.getValueAt(row, 1));
             stm.execute();
+            if(stm.getInt(1)==1)
+                conn.rollback();
+            else 
+                conn.commit();
             stm.close();
+            conn.setAutoCommit(true);
         } catch (SQLException ex) {
             Logger.getLogger(InputRouteUI.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -824,6 +880,7 @@ public class InputRouteUI extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnDeleteCarActionPerformed
     private int addCar(String name, String num,String hourse,String pcity,String ptrack,String ptot, String engine) throws SQLException{
+        
         CallableStatement stm=conn.prepareCall("{? = call ADD_CAR(?,?,?,?,?,?,?,?)}");
             stm.registerOutParameter (1, Types.INTEGER);
             stm.setString(2, userDriverLicense);
@@ -856,18 +913,69 @@ public class InputRouteUI extends javax.swing.JFrame {
             stm.close();
             return result;
     }
-    private void btnAddRouteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddRouteActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnAddRouteActionPerformed
-
     private void btnBuildOptimalRouteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuildOptimalRouteActionPerformed
+        
         this.setVisible(false);
         jFrame1.setVisible(true);
+        DefaultListModel optModel=new DefaultListModel();
+        jList1.setModel(optModel);
+        optModel.removeAllElements();
+        String route=cmbListRoutes.getSelectedItem().toString();
+        try{
+            CallableStatement stm1=conn.prepareCall("{call DEL_OPTIMAL_ROUTE(?,?)}");
+            stm1.setString(1, userDriverLicense);
+            stm1.setString(2, route);
+            CallableStatement stm2=conn.prepareCall("{call SET_OPTIMAL_ROUTE(?,?)}");
+            stm2.setString(1, userDriverLicense);
+            stm2.setString(2, route);
+            CallableStatement stm3=conn.prepareCall("{? = call GET_OPTIMAL_ROUTE(?,?)}");
+            stm3.registerOutParameter (1, OracleTypes.CURSOR);
+            stm3.setString(2, userDriverLicense);
+            stm3.setString(3,route);
+            stm1.execute();
+            stm2.execute();
+            stm3.execute();
+            ResultSet rs=(ResultSet)stm3.getObject(1);
+            while (rs.next()) {
+                optModel.addElement(rs.getString(1).replaceAll(" ", "")+", "+rs.getString(2).replaceAll(" ", "")+", "
+                        +rs.getString(3).replaceAll(" ", "")+", "+rs.getString(4).replaceAll(" ", ""));
+            }
+            stm1.close();
+            stm2.close();
+            stm3.close();
+        } catch (SQLException ex) {
+                    Logger.getLogger(InputRouteUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_btnBuildOptimalRouteActionPerformed
+    private void updateCurRouteStructure(){
+        listmodel=new DefaultListModel();
+        jList2.setModel(listmodel);
+        
+        try{
+            if(cmbListRoutes.getSelectedItem()!=null && !cmbListRoutes.getSelectedItem().equals("NEW")){
+                CallableStatement stm=conn.prepareCall("{? = call GET_ROUTE(?,?)}");
+                stm.registerOutParameter (1, OracleTypes.CURSOR);
+                stm.setString(2, userDriverLicense);
+                stm.setString(3,cmbListRoutes.getSelectedItem().toString());
+                stm.execute();
+                ResultSet rs=(ResultSet)stm.getObject(1);
 
+                while (rs.next()) {
+                   listmodel.addElement(rs.getString(1).replaceAll(" ", "")+", "+rs.getString(2).replaceAll(" ", "")+", "
+                           +rs.getString(3).replaceAll(" ", "")+", "+rs.getString(4).replaceAll(" ", ""));
+                }
+                stm.close();
+            }
+        } catch (SQLException ex) {
+                    Logger.getLogger(InputRouteUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
     private void cmbListRoutesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbListRoutesActionPerformed
+        if(cmbListRoutes.getSelectedItem()!=null)
         jTextField1.setText(cmbListRoutes.getSelectedItem().toString());
-        //cmbListRoutes.getSelectedItem();
+        
+        updateCurRouteStructure();
+  
     }//GEN-LAST:event_cmbListRoutesActionPerformed
 
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
@@ -886,7 +994,27 @@ public class InputRouteUI extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
-       
+        try{
+            if(jList2.getSelectedIndex()!=-1){
+                int index=jList2.getSelectedIndex();
+                listmodel.remove(index);
+                if(!jList2.isEnabled()){
+                    setEditNewPointMode(true);
+                    return;
+                }
+                
+                CallableStatement stm=conn.prepareCall("{? = call DEL_POINT_BY_NUMBER(?,?,?)}");
+                stm.registerOutParameter (1,Types.INTEGER);
+                stm.setString(2, userDriverLicense);
+                stm.setString(3,cmbListRoutes.getSelectedItem().toString());
+                stm.setInt(4,index+1); 
+                stm.execute();
+                System.out.println("DEL_POINT_BY_NUMBER "+stm.getInt(1));
+                stm.close();
+            }
+        } catch (SQLException ex) {
+                    Logger.getLogger(InputRouteUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_jButton7ActionPerformed
 
     private void jTextField5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField5ActionPerformed
@@ -947,10 +1075,6 @@ public class InputRouteUI extends javax.swing.JFrame {
         this.jDialog1.setVisible(true);
     }//GEN-LAST:event_btnUpdateCarActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        //
-    }//GEN-LAST:event_jButton2ActionPerformed
-
     private void jMenu1MenuSelected(javax.swing.event.MenuEvent evt) {//GEN-FIRST:event_jMenu1MenuSelected
          try {
             this.updateCarMenu();
@@ -959,6 +1083,110 @@ public class InputRouteUI extends javax.swing.JFrame {
         }
         this.jMenu3.updateUI();
     }//GEN-LAST:event_jMenu1MenuSelected
+
+    private void btnChangeRouteNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChangeRouteNameActionPerformed
+        String newRouteName=jTextField1.getText();
+        int result;
+        if(cmbListRoutes.getSelectedItem().toString().equals("NEW")){
+           try{
+                CallableStatement stm=conn.prepareCall("{? = call ADD_ROUTE(?,?)}");
+                stm.registerOutParameter (1,Types.INTEGER);
+                stm.setString(2, userDriverLicense);
+                stm.setString(3,newRouteName);
+                stm.execute();
+                result=stm.getInt(1);
+                if(result==0){
+                    updateMyRoute();
+                    cmbListRoutes.setSelectedItem(newRouteName);
+                }
+                stm.close();
+        } catch (SQLException ex) {
+                    Logger.getLogger(InputRouteUI.class.getName()).log(Level.SEVERE, null, ex);
+        } 
+        } else {
+            try{
+                CallableStatement stm=conn.prepareCall("{? = call UPDATE_ROUTE_NAME(?,?,?)}");
+                stm.registerOutParameter (1,Types.INTEGER);
+                stm.setString(2, userDriverLicense);
+                stm.setString(3,cmbListRoutes.getSelectedItem().toString());
+                stm.setString(4,newRouteName);
+                stm.execute();
+                result=stm.getInt(1);
+                if(result==0){
+                    updateMyRoute();
+                    cmbListRoutes.setSelectedItem(newRouteName);
+                }
+                stm.close();
+        } catch (SQLException ex) {
+                    Logger.getLogger(InputRouteUI.class.getName()).log(Level.SEVERE, null, ex);
+        } 
+        }
+        
+    }//GEN-LAST:event_btnChangeRouteNameActionPerformed
+    
+    private void addRouteStructureListener(){
+        
+        jList2.addListSelectionListener(new ListSelectionListenerImpl ()
+            );
+    }
+    private void btnEditCurPointActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditCurPointActionPerformed
+        try{
+            if(jList2.getSelectedIndex()!=-1){
+                int index=jList2.getSelectedIndex();
+                String operator=jList2.isEnabled()? "UPDATE_POINT":"ADD_POINT";
+                index=operator.equals("UPDATE_POINT")? index+1:index;
+                CallableStatement stm=conn.prepareCall("{? = call " +operator+ " (?,?,?,?,?,?,?)}");
+                stm.registerOutParameter (1,Types.INTEGER);
+                stm.setString(2, userDriverLicense);
+                stm.setString(3,cmbListRoutes.getSelectedItem().toString());
+                stm.setInt(4,index); System.out.println(index);
+                stm.setString(5,jComboBox1.getSelectedItem().toString());
+                stm.setString(6,jComboBox2.getSelectedItem().toString());
+                stm.setString(7,jComboBox3.getSelectedItem().toString());
+                stm.setString(8,jComboBox4.getSelectedItem().toString());
+                stm.execute();
+                System.out.println(operator+" "+stm.getInt(1));
+                stm.close();
+                updateCurRouteStructure();
+                if(operator.equals("ADD_POINT"))
+                    this.setEditNewPointMode(true);
+            }
+        } catch (SQLException ex) {
+                    Logger.getLogger(InputRouteUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_btnEditCurPointActionPerformed
+    
+    private void setEditNewPointMode(boolean flag){
+        jList2.setEnabled(flag);
+        jButton4.setEnabled(flag);
+        btnBuildOptimalRoute.setEnabled(flag);
+    }
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+       if(jList2.getSelectedIndex()!=-1){
+           int index=jList2.getSelectedIndex();
+           listmodel.add(index+1,"Нова точка маршруту");
+           jList2.setSelectedIndex(index+1);
+           setEditNewPointMode(false);
+       }
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void btnDeleteRouteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteRouteActionPerformed
+        try{
+            String route=cmbListRoutes.getSelectedItem().toString();
+            if(!route.equals("NEW")){
+                cmbListRoutes.removeItem(route);
+                updateMyRoute();
+                
+                CallableStatement stm=conn.prepareCall("{call DEL_ROUTE(?,?)}");
+                stm.setString(1, userDriverLicense);
+                stm.setString(2,route);
+                stm.execute();
+                stm.close();
+            }
+        } catch (SQLException ex) {
+                    Logger.getLogger(InputRouteUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_btnDeleteRouteActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1002,16 +1230,18 @@ public class InputRouteUI extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAddCar;
-    private javax.swing.JButton btnAddRoute;
     private javax.swing.JButton btnBuildOptimalRoute;
+    private javax.swing.JButton btnChangeRouteName;
     private javax.swing.JButton btnChangeTableCar;
     private javax.swing.JButton btnDeleteCar;
     private javax.swing.JButton btnDeleteRoute;
+    private javax.swing.JButton btnEditCurPoint;
     private javax.swing.JButton btnUpdateCar;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JComboBox cmbListRoutes;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton7;
     private javax.swing.JComboBox jComboBox1;
@@ -1080,5 +1310,124 @@ public class InputRouteUI extends javax.swing.JFrame {
         jLabel2.setForeground(typical);
         jLabel2.setText("Активний автомобіль: "+car);
         btnBuildOptimalRoute.setEnabled(true);
+    }
+    
+    private void updateMyRoute() throws SQLException{
+        this.cmbListRoutes.removeAllItems();
+        this.cmbListRoutes.addItem("NEW");
+        conn.setAutoCommit(false);
+        conn.setReadOnly(true);
+        Statement stm=conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_UPDATABLE);
+        ResultSet rs=stm.executeQuery("select * from USER_ROUT where driver_license='"+userDriverLicense+"'");
+        while (rs.next()) {
+            this.cmbListRoutes.addItem(rs.getString(2).replaceAll(" ", ""));
+        }
+        conn.commit();
+        conn.setAutoCommit(true);
+        stm.close();
+    }
+    public void updateCombo2() throws SQLException{
+        this.jComboBox2.removeAllItems();
+        if(this.jComboBox1.getSelectedItem()==null)
+            return;
+        Statement stm;
+        ResultSet rs;
+        stm=conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_UPDATABLE);
+            rs=stm.executeQuery("select city_name from equivalent where counrty_name='"+jComboBox1.getSelectedItem().toString()+"'"+
+                    "GROUP BY (city_name) ORDER BY 1");
+        while (rs.next()) {
+            this.jComboBox2.addItem(rs.getString(1).replaceAll(" ", ""));
+        }
+        stm.close();
+    }
+    public void updateCombo3() throws SQLException{
+        this.jComboBox3.removeAllItems();
+        if(this.jComboBox2.getSelectedItem()==null)
+            return;
+        
+        ResultSet rs;
+        /*PreparedStatement stm;
+        stm=conn.prepareStatement("select street_name from equivalent where counrty_name= ? and city_name= ? GROUP BY (street_name)  ORDER BY 1");
+        stm.setString(1, "'"+this.jComboBox1.getSelectedItem().toString()+"'"); System.out.println("'"+this.jComboBox1.getSelectedItem().toString()+"'");
+        stm.setString(2, "'"+this.jComboBox2.getSelectedItem().toString()+"'"); System.out.println("'"+this.jComboBox2.getSelectedItem().toString()+"'");
+        rs=stm.executeQuery();*/
+        Statement stm;
+        stm=conn.createStatement();
+        rs=stm.executeQuery("select street_name from equivalent where counrty_name="
+                + " '"+jComboBox1.getSelectedItem().toString()+"' and city_name="
+                + " '"+jComboBox2.getSelectedItem().toString()+"'"
+                + " GROUP BY (street_name)  ORDER BY 1"
+            );
+        while (rs.next()) {
+            this.jComboBox3.addItem(rs.getString(1).replaceAll(" ", ""));
+        }
+        stm.close();
+    }
+    public void updateCombo4() throws SQLException{
+        this.jComboBox4.removeAllItems();
+        if(this.jComboBox3.getSelectedItem()==null)
+            return;
+        ResultSet rs;
+        Statement stm;
+        stm=conn.createStatement();
+        rs=stm.executeQuery("select house_number from equivalent where counrty_name="
+                + " '"+jComboBox1.getSelectedItem().toString()+"' and city_name="
+                + " '"+jComboBox2.getSelectedItem().toString()+"' and street_name="
+                + " '"+jComboBox3.getSelectedItem().toString()+"'"
+                + " GROUP BY (house_number)  ORDER BY 1"
+            );
+        while (rs.next()) {
+            this.jComboBox4.addItem(rs.getString(1).replaceAll(" ", ""));
+        }
+        stm.close();
+    }
+    public void initUpdateCombo() throws SQLException{
+        this.jComboBox1.removeAllItems();
+        this.jComboBox1.setActionCommand("comb1");
+        Statement stm=conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_UPDATABLE);
+        ResultSet rs=stm.executeQuery("select * from COUNTRY  ORDER BY 1");
+        while (rs.next()) {
+            this.jComboBox1.addItem(rs.getString(1).replaceAll(" ", ""));
+        }
+        stm.close();
+        this.jComboBox2.setActionCommand("comb2");
+        this.jComboBox3.setActionCommand("comb3");
+    }
+
+    private class ListSelectionListenerImpl implements ListSelectionListener {
+
+        public ListSelectionListenerImpl() {
+        }
+
+        @Override
+        public void valueChanged(ListSelectionEvent e) {
+            if(!jList2.isEnabled())
+                return;
+            try{
+                if(jList2.getSelectedIndex()!=-1){
+                    int index=jList2.getSelectedIndex()+1;
+                    CallableStatement stm=conn.prepareCall("{? = call GET_ROUTE(?,?)}");
+                    stm.registerOutParameter (1, OracleTypes.CURSOR);
+                    stm.setString(2, userDriverLicense);
+                    stm.setString(3,cmbListRoutes.getSelectedItem().toString());
+                    stm.execute();
+                    ResultSet rs=(ResultSet)stm.getObject(1);
+                    int i=0;
+                    while(i<index){
+                        rs.next();
+                        i++;
+                    }
+                    if(!jList2.getSelectedValue().toString().equals("Нова точка маршруту")){
+                        jComboBox1.setSelectedItem(rs.getString(1).replaceAll(" ", ""));
+                        jComboBox2.setSelectedItem(rs.getString(2).replaceAll(" ", ""));
+                        jComboBox3.setSelectedItem(rs.getString(3).replaceAll(" ", ""));
+                        jComboBox4.setSelectedItem(rs.getString(4).replaceAll(" ", ""));
+                    }
+                    stm.close();
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(InputRouteUI.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 }

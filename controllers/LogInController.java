@@ -122,7 +122,7 @@ public class LogInController implements ActionListener, FocusListener {
 
     private void login() throws SQLException {
         if(form.checkLogInFields()){
-            Connection con=ConnectionToRDBMS.getDBConnection("MYKOLA_KUKSA", "MYKOLA_KUKSA");
+            Connection con=ConnectionToRDBMS.getDBuserConnection();
             CallableStatement stm=con.prepareCall("{? = call CHECK_LOGIN_PASSWORD(?,?)}");
             stm.registerOutParameter (1, Types.INTEGER);
             stm.setString(2,form.getLoginAtoutization());
@@ -146,6 +146,8 @@ public class LogInController implements ActionListener, FocusListener {
                     InputRouteUI.main(arg);
                     return;
                 case  1: //if user is admin
+                    showMessageDialog(form, "Авторизація завершена успішно!\nПривіт, адмін!", "Вітання",PLAIN_MESSAGE);
+                    form.hide();
                     String [] args=new String[1];
                     Admin.main(args);
                     return;
@@ -167,7 +169,7 @@ public class LogInController implements ActionListener, FocusListener {
 
     private void signIn() throws SQLException {
         if(form.checkSignInFields()){
-            Connection con=ConnectionToRDBMS.getDBConnection("MYKOLA_KUKSA", "MYKOLA_KUKSA");
+            Connection con=ConnectionToRDBMS.getDBuserConnection();
             CallableStatement stm=con.prepareCall("{? = call ADD_USER(?,?,?)}");
             stm.registerOutParameter (1, Types.INTEGER);
             stm.setString(2,form.getLoginSignIn());

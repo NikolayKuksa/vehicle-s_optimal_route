@@ -28,6 +28,7 @@ public class LogInUI extends javax.swing.JFrame {
         setFieldFilters();
         loginControl=new LogInController(this);
         addListenerForComponents();  
+        
     }
 
     /**
@@ -318,7 +319,7 @@ public class LogInUI extends javax.swing.JFrame {
         this.txtLoginAutorization.setText("");
         this.txtPasswordAutorization.setText("");
         this.lblLoginStatusAutorization.setText("");
-        this.lblPassStatus.setText(null);;
+        this.lblPassStatus.setText(null);
     }
     private void btnSignInActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSignInActionPerformed
 
