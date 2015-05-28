@@ -6,9 +6,20 @@
 
 package src;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 import java.sql.*;
 import static javax.swing.JOptionPane.ERROR_MESSAGE;
 import static javax.swing.JOptionPane.showMessageDialog;
+import javax.swing.text.Document;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import org.xml.sax.SAXException;
 
 /**
  *
@@ -17,7 +28,8 @@ import static javax.swing.JOptionPane.showMessageDialog;
 public class ConnectionToRDBMS {
     private static Connection conn;
     public static Connection getDBuserConnection(){
-            return getDBConnection("MYKOLA__KUKSA","MYKOLA__KUKSA");
+        //return getDBConnection("MYKOLA__KUKSA","MYKOLA__KUKSA");
+        return getDBConnection("UNIT_T","UNIT_T");
     }
     
      public static Connection getDBConnection(String user,String password) {
@@ -39,7 +51,7 @@ public class ConnectionToRDBMS {
      * @param args
      * @throws SQLException 
      */
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) throws SQLException, MalformedURLException, ProtocolException, IOException, ParserConfigurationException, SAXException {
         /*Statement stm3;
          stm3=con.createStatement(ResultSet.TYPE_FORWARD_ONLY,ResultSet.CONCUR_UPDATABLE);
          ResultSet src=stm3.executeQuery("select driver.driver_license,car_name,count_hourse,car_number, driver.login,driver.password\n" +
@@ -50,17 +62,37 @@ public class ConnectionToRDBMS {
          src.updateString("car_name", "car1");
          src.updateRow();
         //System.out.println(conn.toString());*/
-        getDBuserConnection();
-        PreparedStatement stm; 
+        
+        /*getDBuserConnection();
+        Statement stm; 
         ResultSet rs;
-        stm=conn.prepareStatement("select geo_x from \"GEOGRAPHICAL POINT\" where geo_x>=?");//GROUP BY (street_name)
-        stm.setInt(1, 2);
-        /*stm.setString(1,"country1"); //
-        stm.setString(2, "city1" );*/
-        rs=stm.executeQuery();
+        stm=conn.createStatement();
+        rs=stm.executeQuery("select *from has");
         while(rs.next()){
-            System.out.println(rs.getFloat(1));
+            System.out.println(rs.getDate(1)+"||"+rs.getString(2));
         }
+        */
+    /*    
+    String uri =
+    "http://api.flurry.com/eventMetrics/Event?apiAccessCode=YHJBA13CSKTMS6XHTM6M&apiKey=6XQY729FDU1CR9FKXVZP&startDate=2011-2-28&endDate=2011-3-1&eventName=Tip%20Calculated";
+
+    URL url = new URL(uri);
+    HttpURLConnection connection =
+        (HttpURLConnection) url.openConnection();
+    connection.setRequestMethod("GET");
+    connection.setRequestProperty("Accept", "application/xml");
+
+    InputStream xml = connection.getInputStream();
+    System.out.println(xml);
+    System.out.println("\n\n!!!!!!!!!!!!!!!!!!!!!!!!");
+    /*DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+    DocumentBuilder db = dbf.newDocumentBuilder();
+    Document doc = (Document) db.parse(xml);
+            System.out.println(doc);*/
+        
+        URL xmlUrl = new URL("http://www.rekindle.co.za/rss.xml");
+InputStream in = xmlUrl.openStream();
+System.out.println();
     }
  
 }
